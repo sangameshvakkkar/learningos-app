@@ -1,0 +1,43 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: learningos-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-learningos}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-learningos}
+      POSTGRES_DB: ${POSTGRES_DB:-learningos}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-learningos} -d ${POSTGRES_DB:-learningos}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    container_name: learningos-backend
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-learningos}:${POSTGRES_PASSWORD:-learningos}@postgres:5432/${POSTGRES_DB:-learningos}
+      SECRET_KEY: ${SECRET_KEY:-change-me-in-production}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173,http://127.0.0.1:5173}
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    container_name: learningos-frontend
+    environment:
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:8000/api/v1}
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

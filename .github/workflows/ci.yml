@@ -1,0 +1,5 @@
+name: LearningOS CI
+on: #which event starts this workflow?
+  pull_request:
+    branches: 
+      - main
