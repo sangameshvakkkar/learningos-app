@@ -6,3 +6,7 @@ on: #which event starts this workflow?
 jobs:
   frontend-validation:
     runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        
