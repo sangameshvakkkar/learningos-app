@@ -15,5 +15,10 @@ jobs:
       - name: Build Frontend
         run: npm run build
         working-directory: frontend
+
+        # adding lint 
+      - name: Run ESLint
+        working-directory: frontend
+        run: npm run lint
       
         
