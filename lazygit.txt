@@ -1,1 +1,2 @@
 hello from develop branch
+Hello from Lazygit branch
