@@ -1,2 +1,2 @@
-hello from develop branch
-hello from develop
+Hello from Lazygit branch
+Second merger on Lazygit Branch
