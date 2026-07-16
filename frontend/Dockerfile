@@ -1,12 +1,20 @@
-FROM node:20-alpine
+# ── Stage 1: Build ──────────────────────────────────
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-COPY package.json package-lock.json* ./
-RUN npm install
+COPY package.json package-lock.json ./
+RUN npm ci                            # why ci and not install?
 
 COPY . .
+RUN npm run build
 
-EXPOSE 5173
+# ── Stage 2: Serve ──────────────────────────────────
+FROM nginx:alpine AS production   # what serves static files?
 
-CMD ["npm", "run", "dev"]
+# Copy ONLY the build output from Stage 1
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
