@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS courses (
   description TEXT NOT NULL,
   level VARCHAR(50) NOT NULL,
   duration_minutes INTEGER NOT NULL,
+  category VARCHAR(100),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -26,4 +27,25 @@ CREATE TABLE IF NOT EXISTS enrollments (
   course_id UUID NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
   enrolled_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   CONSTRAINT uq_enrollments_user_course UNIQUE (user_id, course_id)
+);
+
+CREATE TABLE IF NOT EXISTS lessons (
+  id UUID PRIMARY KEY,
+  course_id UUID NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+  title VARCHAR(255) NOT NULL,
+  slug VARCHAR(255) NOT NULL,
+  content TEXT NOT NULL,
+  order_index INTEGER NOT NULL DEFAULT 0,
+  duration_minutes INTEGER NOT NULL DEFAULT 10,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  CONSTRAINT uq_lessons_course_slug UNIQUE (course_id, slug)
+);
+
+CREATE TABLE IF NOT EXISTS lesson_progress (
+  id UUID PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  lesson_id UUID NOT NULL REFERENCES lessons(id) ON DELETE CASCADE,
+  completed_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  CONSTRAINT uq_progress_user_lesson UNIQUE (user_id, lesson_id)
 );

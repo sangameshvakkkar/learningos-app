@@ -1,8 +1,21 @@
 import { api } from "./client";
-import type { Course, Enrollment } from "../types";
+import type { Course, CourseDetail, Enrollment } from "../types";
 
-export async function getCourses(): Promise<Course[]> {
-  const { data } = await api.get<Course[]>("/courses");
+export async function getCourses(params?: {
+  search?: string;
+  level?: string;
+  skip?: number;
+  limit?: number;
+}): Promise<Course[]> {
+  const cleanParams = Object.fromEntries(
+    Object.entries(params || {}).filter(([_, v]) => v !== undefined && v !== "")
+  );
+  const { data } = await api.get<Course[]>("/courses", { params: cleanParams });
+  return data;
+}
+
+export async function getCourse(courseId: string): Promise<CourseDetail> {
+  const { data } = await api.get<CourseDetail>(`/courses/${courseId}`);
   return data;
 }
 

@@ -33,14 +33,19 @@ jobs:
         run: npm run lint               # runs first — cheapest check, fail fast
         working-directory: frontend
 
+      - name: Test
+        run: npm run test -- --run      # --run prevents vitest from running in watch mode
+        working-directory: frontend
+
       - name: Build
-        run: npm run build              # runs only if lint passes
+        run: npm run build              # runs only if lint and tests pass
         working-directory: frontend
 
   # ── Job 2: Backend Code Quality ──────────────────────────────────────────
-  # No tests exist yet, so we validate what we can:
   # 1. All dependencies install correctly
-  # 2. Every .py file has valid syntax (catches typos, bad imports at module level)
+  # 2. Every .py file has valid syntax
+  # 3. Code conforms to ruff linting
+  # 4. Pytest test suite passes
   backend-validation:
     name: Backend Validation
     runs-on: ubuntu-latest
@@ -61,6 +66,14 @@ jobs:
 
       - name: Syntax Check
         run: python -m compileall app   # parses every .py — catches syntax errors
+        working-directory: backend
+
+      - name: Lint with Ruff
+        run: python -m ruff check app tests
+        working-directory: backend
+
+      - name: Run Tests
+        run: python -m pytest
         working-directory: backend
 
   # ── Job 3: Docker Image Builds ───────────────────────────────────────────

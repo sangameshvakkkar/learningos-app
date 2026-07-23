@@ -9,6 +9,8 @@ import { LoginPage } from "./pages/LoginPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { ProfilePage } from "./pages/ProfilePage";
 import { RegisterPage } from "./pages/RegisterPage";
+import { CourseDetailPage } from "./features/courses/CourseDetailPage";
+import { LessonViewerPage } from "./features/courses/LessonViewerPage";
 
 export const router = createBrowserRouter([
   { path: "/", element: <LandingPage /> },
@@ -23,6 +25,8 @@ export const router = createBrowserRouter([
         children: [
           { index: true, element: <DashboardPage /> },
           { path: "catalog", element: <CatalogPage /> },
+          { path: "courses/:courseId", element: <CourseDetailPage /> },
+          { path: "courses/:courseId/lessons/:lessonId", element: <LessonViewerPage /> },
           { path: "profile", element: <ProfilePage /> },
           { path: "*", element: <Navigate to="/app" replace /> }
         ]
