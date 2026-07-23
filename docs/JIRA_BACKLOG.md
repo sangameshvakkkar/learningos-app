@@ -1,6 +1,7 @@
 # LearningOS MVP — Jira Epics & User Stories (Project Key: `LSS`)
 
-This document outlines all Epics, Sprints, and User Stories for the Cloud & DevOps learning roadmap of **LearningOS MVP**.
+> ⚠️ **COST CONSTRAINT RULE**: Maximum cloud spending must NOT exceed **₹200 INR/month (~$2.40 USD)**.
+> All cloud architectures in this backlog strictly use **AWS 12-Month Free Tier** (EC2 `t2.micro`/`t3.micro`, RDS Free Tier) and **zero-cost alternatives** (Nginx on EC2 instead of paid ALB, avoiding NAT Gateway charges).
 
 ---
 
@@ -74,29 +75,29 @@ This document outlines all Epics, Sprints, and User Stories for the Cloud & DevO
 
 ---
 
-## ☁️ Epic 2: LSS-E2 Cloud Infrastructure (AWS) (Sprint 2)
+## ☁️ Epic 2: LSS-E2 Zero-Cost Cloud Infrastructure (AWS Free Tier) (Sprint 2)
 
-### 📌 LSS-7: AWS Account & IAM Setup
+### 📌 LSS-7: AWS Account & Free-Tier Security Setup
 - **Issue Type:** Story
 - **Sprint:** Sprint 2
 - **Priority:** Critical
-- **Labels:** `aws`, `iam`, `security`
-- **Description:** Set up AWS account with proper security: root MFA enabled, IAM admin user created, no root usage for daily work. AWS CLI configured locally.
+- **Labels:** `aws`, `iam`, `security`, `cost-control`
+- **Description:** Set up AWS account with Root MFA, IAM Admin user, AWS Budget Alerts set at ₹150 INR ($1.80 USD) to prevent unexpected charges.
 - **Acceptance Criteria:**
-  - AWS account created
-  - Root MFA enabled
+  - AWS account created & Root MFA enabled
   - IAM admin user created (no root usage)
-  - AWS CLI configured and tested
+  - AWS Budget alert set at ₹150 INR ($1.80 USD)
+  - AWS CLI configured locally
 
-### 📌 LSS-8: Amazon ECR Repository
+### 📌 LSS-8: Amazon ECR Repository (Free Tier)
 - **Issue Type:** Story
 - **Sprint:** Sprint 2
 - **Priority:** High
 - **Labels:** `aws`, `ecr`, `docker`
-- **Description:** Create ECR repositories for frontend and backend images. Configure lifecycle policy to keep last 10 images. Verify manual push/pull.
+- **Description:** Create ECR repositories for frontend and backend images. Configure lifecycle policy to keep last 5 images to stay under 500MB free storage tier.
 - **Acceptance Criteria:**
   - ECR repos created for frontend + backend
-  - Lifecycle policy: keep last 10 images
+  - Lifecycle policy: keep last 5 images (under 500MB free limit)
   - Can push/pull images manually
 
 ### 📌 LSS-9: CI Push to ECR via OIDC
@@ -104,120 +105,82 @@ This document outlines all Epics, Sprints, and User Stories for the Cloud & DevO
 - **Sprint:** Sprint 2
 - **Priority:** High
 - **Labels:** `aws`, `ecr`, `ci`, `oidc`
-- **Description:** CI pipeline pushes Docker images to ECR on main branch merge. Uses OIDC federation (no static AWS access keys). Tagged with SHA + latest.
+- **Description:** CI pipeline pushes Docker images to ECR on main branch merge using free OIDC federation (no static AWS keys).
 - **Acceptance Criteria:**
   - CI pushes images to ECR on main merge
   - Uses OIDC (no static AWS keys)
   - Images tagged with SHA + latest
 
-### 📌 LSS-10: VPC & Networking
+### 📌 LSS-10: Zero-Cost VPC & Security Groups
 - **Issue Type:** Story
 - **Sprint:** Sprint 2
 - **Priority:** High
-- **Labels:** `aws`, `vpc`, `networking`
-- **Description:** Create VPC with public and private subnets across 2 AZs. NAT gateway for private subnet egress. Security groups for each service tier.
+- **Labels:** `aws`, `vpc`, `networking`, `zero-cost`
+- **Description:** Create standard VPC with Internet Gateway. Avoid NAT Gateway ($32/mo fee!). Use public subnets with tight Security Groups.
 - **Acceptance Criteria:**
-  - VPC with public + private subnets (2 AZs)
-  - NAT gateway for private subnet egress
-  - Security groups defined for each tier
+  - VPC with Internet Gateway (100% Free)
+  - NO NAT Gateway created
+  - Security Groups restricting HTTP/HTTPS and SSH access
 
-### 📌 LSS-11: ECS Cluster & Task Definitions
+### 📌 LSS-11: Free-Tier EC2 Deployment (t2.micro / t3.micro)
 - **Issue Type:** Story
 - **Sprint:** Sprint 2
 - **Priority:** High
-- **Labels:** `aws`, `ecs`, `fargate`
-- **Description:** Create ECS Fargate cluster. Define task definitions for frontend and backend. Environment variables sourced from Secrets Manager.
+- **Labels:** `aws`, `ec2`, `docker-compose`, `zero-cost`
+- **Description:** Provision AWS Free Tier EC2 instance (`t2.micro`/`t3.micro` — 750 hrs/mo free). Run frontend + backend using Docker Compose and Nginx reverse proxy (avoiding $20/mo ALB fee).
 - **Acceptance Criteria:**
-  - ECS Fargate cluster created
-  - Task definitions for frontend + backend
-  - Env vars from Secrets Manager
+  - EC2 `t2.micro` or `t3.micro` instance running (Free Tier)
+  - Docker & Docker Compose installed
+  - App accessible via EC2 Elastic IP / Public IP
+  - Zero ALB/NAT gateway charges incurred
 
-### 📌 LSS-12: ECS Services & ALB
+### 📌 LSS-12: Database Setup (RDS Free Tier or Managed Free Postgres)
 - **Issue Type:** Story
 - **Sprint:** Sprint 2
 - **Priority:** High
-- **Labels:** `aws`, `ecs`, `alb`
-- **Description:** Create ECS services for frontend and backend. ALB routes traffic to services. Health checks passing. App accessible via ALB DNS name.
+- **Labels:** `aws`, `rds`, `database`, `free-tier`
+- **Description:** Provision RDS PostgreSQL `db.t3.micro` (750 hrs free tier) or integrate free managed database (Neon / Supabase).
 - **Acceptance Criteria:**
-  - ECS services running frontend + backend
-  - ALB routes traffic correctly
-  - Health checks passing
-  - App accessible via ALB DNS
+  - PostgreSQL database running on AWS RDS Free Tier or Neon/Supabase free tier
+  - Backend connects securely via SSL/TLS
+  - Zero monthly cost ($0.00 / ₹0)
 
-### 📌 LSS-13: RDS PostgreSQL
-- **Issue Type:** Story
-- **Sprint:** Sprint 2
-- **Priority:** High
-- **Labels:** `aws`, `rds`, `database`
-- **Description:** Provision RDS PostgreSQL instance in private subnet. Backend connects to RDS instead of local postgres. Automated backups enabled.
-- **Acceptance Criteria:**
-  - RDS instance in private subnet
-  - Backend connects to RDS
-  - Automated backups enabled
-  - Connection string via Secrets Manager
-
-### 📌 LSS-14: First Cloud Deployment (End-to-End)
+### 📌 LSS-13: End-to-End Zero-Cost Cloud Deployment Pipeline
 - **Issue Type:** Story
 - **Sprint:** Sprint 2
 - **Priority:** Critical
-- **Labels:** `aws`, `deployment`, `pipeline`
-- **Description:** Push to main triggers full pipeline: CI builds → ECR push → ECS deploys → app live on ALB. Document the complete pipeline flow.
+- **Labels:** `aws`, `deployment`, `pipeline`, `zero-cost`
+- **Description:** Automated CI/CD pipeline deploys code changes to EC2 Free Tier automatically upon push to `main`.
 - **Acceptance Criteria:**
-  - Push to main → CI → ECR → ECS → live
-  - Full pipeline documented
+  - Push to main → CI build → ECR push → EC2 deployment update
+  - Complete zero-cost deployment verified ($0 / ₹0 billed)
   - Rollback procedure documented
 
 ---
 
 ## 🏗️ Epic 3: LSS-E3 Infrastructure as Code (Terraform) (Sprint 3)
 
-### 📌 LSS-15: Terraform Setup & Remote State
+### 📌 LSS-14: Terraform Setup & Remote State (Free S3 Backend)
 - **Issue Type:** Story
 - **Sprint:** Sprint 3
 - **Priority:** High
 - **Labels:** `terraform`, `iac`
-- **Description:** Initialize Terraform with AWS provider. Configure S3 backend with DynamoDB state locking. State stored remotely, not locally.
+- **Description:** Initialize Terraform with S3 backend + DynamoDB state locking (within AWS Free Tier limits).
 - **Acceptance Criteria:**
-  - Terraform initialized with AWS provider
   - S3 backend + DynamoDB lock table
-  - State stored remotely
-  - `terraform init` succeeds
+  - State stored remotely without cost
 
-### 📌 LSS-16: VPC Module (Terraform)
+### 📌 LSS-15: EC2 & VPC Module (Terraform)
 - **Issue Type:** Story
 - **Sprint:** Sprint 3
 - **Priority:** High
-- **Labels:** `terraform`, `vpc`, `networking`
-- **Description:** Codify VPC, subnets, route tables, NAT gateway as Terraform module. Should match manually-created infrastructure. `terraform plan` shows no drift.
+- **Labels:** `terraform`, `ec2`, `zero-cost`
+- **Description:** Codify zero-cost VPC, Security Groups, and Free-Tier EC2 instance as Terraform modules.
 - **Acceptance Criteria:**
-  - VPC module creates all networking resources
-  - Matches existing manual infrastructure
-  - `terraform plan` shows no drift
+  - Terraform code manages VPC & EC2 instance
+  - `terraform plan` shows zero paid components (no ALB, no NAT GW)
 
-### 📌 LSS-17: ECS + ALB Module (Terraform)
-- **Issue Type:** Story
-- **Sprint:** Sprint 3
-- **Priority:** High
-- **Labels:** `terraform`, `ecs`, `alb`
-- **Description:** Codify ECS cluster, services, task definitions, and ALB as Terraform module. Can destroy and recreate without manual steps.
-- **Acceptance Criteria:**
-  - ECS + ALB fully managed by Terraform
-  - Can destroy and recreate cleanly
-  - No manual console steps needed
-
-### 📌 LSS-18: RDS Module (Terraform)
-- **Issue Type:** Story
-- **Sprint:** Sprint 3
-- **Priority:** High
-- **Labels:** `terraform`, `rds`, `database`
-- **Description:** Codify RDS instance as Terraform module. Credentials stored in Secrets Manager (not in state file). Subnet group in private subnets.
-- **Acceptance Criteria:**
-  - RDS managed by Terraform
-  - Credentials in Secrets Manager
-  - `prevent_destroy` lifecycle rule enabled
-  - Private subnet placement
-
-### 📌 LSS-19: Terraform in CI
+### 📌 LSS-16: Terraform in CI
 - **Issue Type:** Story
 - **Sprint:** Sprint 3
 - **Priority:** High
@@ -227,219 +190,39 @@ This document outlines all Epics, Sprints, and User Stories for the Cloud & DevO
   - `terraform plan` runs on PRs
   - Plan output visible in PR comment
   - `apply` only on main merge (manual approval)
-  - No auto-apply without review
 
 ---
 
-## ☸️ Epic 4: LSS-E4 Kubernetes (Sprint 4)
+## ☸️ Epic 4: LSS-E4 Kubernetes (Local & Free Tier) (Sprint 4)
 
-### 📌 LSS-20: Local K8s Cluster
+### 📌 LSS-17: Local K8s Cluster (Minikube / k3s)
 - **Issue Type:** Story
 - **Sprint:** Sprint 4
 - **Priority:** High
 - **Labels:** `kubernetes`, `local`
-- **Description:** Set up local Kubernetes cluster using Minikube or Kind. `kubectl` configured and working. Can deploy a test pod successfully.
+- **Description:** Set up local Kubernetes cluster using Minikube / k3s on developer machine (100% free, zero cloud cost).
 - **Acceptance Criteria:**
   - Local K8s cluster running
   - `kubectl` configured and connected
-  - Test pod deploys and runs successfully
+  - App deployed and tested locally
 
-### 📌 LSS-21: LearningOS Deployments & Services
+### 📌 LSS-18: LearningOS Deployments & Services
 - **Issue Type:** Story
 - **Sprint:** Sprint 4
 - **Priority:** High
 - **Labels:** `kubernetes`, `deployments`
-- **Description:** Deploy frontend, backend, and postgres as Kubernetes Deployments. Create ClusterIP services. App works within the cluster.
+- **Description:** Deploy frontend, backend, and postgres as Kubernetes Deployments. Create ClusterIP services.
 - **Acceptance Criteria:**
   - Frontend + backend + postgres as Deployments
   - ClusterIP services for each
   - App functions correctly in cluster
 
-### 📌 LSS-22: Ingress & External Access
+### 📌 LSS-19: Ingress, ConfigMaps & Helm Charts
 - **Issue Type:** Story
 - **Sprint:** Sprint 4
 - **Priority:** High
-- **Labels:** `kubernetes`, `ingress`, `networking`
-- **Description:** Install ingress controller (nginx). Frontend accessible via ingress. Path-based routing sends `/api` to backend.
+- **Labels:** `kubernetes`, `helm`, `ingress`
+- **Description:** Package app with Helm, Nginx Ingress Controller, ConfigMaps, and Secrets.
 - **Acceptance Criteria:**
-  - Ingress controller installed
-  - Frontend accessible via ingress
-  - `/api` routes to backend service
-
-### 📌 LSS-23: ConfigMaps & Secrets
-- **Issue Type:** Story
-- **Sprint:** Sprint 4
-- **Priority:** Medium
-- **Labels:** `kubernetes`, `config`, `secrets`
-- **Description:** Move all app configuration to ConfigMaps. Sensitive values stored as K8s Secrets. No hardcoded env vars in deployment manifests.
-- **Acceptance Criteria:**
-  - App config via ConfigMaps
-  - Sensitive values via K8s Secrets
-  - No hardcoded values in manifests
-
-### 📌 LSS-24: Helm Charts
-- **Issue Type:** Story
-- **Sprint:** Sprint 4
-- **Priority:** High
-- **Labels:** `kubernetes`, `helm`
-- **Description:** Package LearningOS as a Helm chart. Configurable via `values.yaml`. Can install, upgrade, and rollback releases.
-- **Acceptance Criteria:**
-  - Helm chart created for LearningOS
-  - Configurable via `values.yaml`
-  - `helm install`/`upgrade`/`rollback` tested
-
-### 📌 LSS-25: HPA & Resource Limits
-- **Issue Type:** Story
-- **Sprint:** Sprint 4
-- **Priority:** Medium
-- **Labels:** `kubernetes`, `scaling`, `performance`
-- **Description:** Configure Horizontal Pod Autoscaler for backend (CPU-based). Set resource requests and limits. Verify scaling under simulated load.
-- **Acceptance Criteria:**
-  - HPA on backend (CPU threshold)
-  - Resource requests/limits set on all pods
-  - Scales up under load
-
-### 📌 LSS-26: Liveness & Readiness Probes
-- **Issue Type:** Story
-- **Sprint:** Sprint 4
-- **Priority:** Medium
-- **Labels:** `kubernetes`, `health`
-- **Description:** Configure readiness probes using `/health` endpoint. Liveness probes restart crashed containers. Test failure scenarios.
-- **Acceptance Criteria:**
-  - Readiness probe on `/api/v1/health`
-  - Liveness probe restarts crashed pods
-  - Tested: killed process → pod restarts
-
----
-
-## 📊 Epic 5: LSS-E5 Monitoring & Observability (Sprint 5)
-
-### 📌 LSS-27: Prometheus Server & Scraping
-- **Issue Type:** Story
-- **Sprint:** Sprint 5
-- **Priority:** High
-- **Labels:** `monitoring`, `prometheus`
-- **Description:** Deploy Prometheus server. Configure scrape targets for backend. Verify metrics queryable via PromQL in Prometheus UI.
-- **Acceptance Criteria:**
-  - Prometheus deployed (K8s or Docker)
-  - Scrapes backend `/metrics` endpoint
-  - Metrics queryable in Prometheus UI
-
-### 📌 LSS-28: Grafana Dashboards
-- **Issue Type:** Story
-- **Sprint:** Sprint 5
-- **Priority:** High
-- **Labels:** `monitoring`, `grafana`, `dashboards`
-- **Description:** Connect Grafana to Prometheus. Build dashboards: request rate, error rate, latency percentiles, system metrics (CPU/memory).
-- **Acceptance Criteria:**
-  - Grafana connected to Prometheus
-  - Dashboard: request rate, error rate, latency p50/p95/p99
-  - Dashboard: CPU and memory usage
-
-### 📌 LSS-29: Structured Logging & Loki
-- **Issue Type:** Story
-- **Sprint:** Sprint 5
-- **Priority:** Medium
-- **Labels:** `logging`, `loki`, `grafana`
-- **Description:** Switch backend to structured JSON logging. Deploy Loki for log aggregation. Grafana queries logs via Loki data source.
-- **Acceptance Criteria:**
-  - JSON structured log output
-  - Loki deployed and receiving logs
-  - Grafana queries logs via Loki
-
-### 📌 LSS-30: Alerting Rules
-- **Issue Type:** Story
-- **Sprint:** Sprint 5
-- **Priority:** High
-- **Labels:** `monitoring`, `alerting`
-- **Description:** Define alert rules: error rate > 5%, p99 latency > 2s, pod restarts > 3. Configure Alertmanager with notification routing.
-- **Acceptance Criteria:**
-  - Alert on error rate > 5%
-  - Alert on p99 latency > 2s
-  - Alertmanager routing configured
-
----
-
-## 🔐 Epic 6: LSS-E6 Security (Sprint 6)
-
-### 📌 LSS-31: IAM Least Privilege Audit
-- **Issue Type:** Story
-- **Sprint:** Sprint 6
-- **Priority:** High
-- **Labels:** `security`, `iam`, `aws`
-- **Description:** Review all IAM roles and policies. Scope to minimum required permissions. No wildcard (*) in resource fields.
-- **Acceptance Criteria:**
-  - All IAM roles audited
-  - Policies scoped to minimum permissions
-  - No `*` in resource fields
-
-### 📌 LSS-32: Secrets Rotation
-- **Issue Type:** Story
-- **Sprint:** Sprint 6
-- **Priority:** Medium
-- **Labels:** `security`, `secrets`, `aws`
-- **Description:** DB password rotatable via Secrets Manager. JWT secret rotatable without downtime. Rotation procedures documented and tested.
-- **Acceptance Criteria:**
-  - DB password rotatable via Secrets Manager
-  - JWT secret rotation without downtime
-  - Tested: rotated secret → app stays healthy
-
-### 📌 LSS-33: Network Policies
-- **Issue Type:** Story
-- **Sprint:** Sprint 6
-- **Priority:** Medium
-- **Labels:** `security`, `kubernetes`, `networking`
-- **Description:** K8s NetworkPolicies: backend → postgres only, frontend → backend only. Default deny ingress. Tested with blocked traffic verification.
-- **Acceptance Criteria:**
-  - NetworkPolicies enforced
-  - backend → postgres only
-  - frontend → backend only
-  - Default deny ingress
-
----
-
-## 🏛️ Epic 7: LSS-E7 Architecture & Capstone (Sprint 7)
-
-### 📌 LSS-34: Production Architecture Diagram
-- **Issue Type:** Story
-- **Sprint:** Sprint 7
-- **Priority:** High
-- **Labels:** `architecture`, `documentation`
-- **Description:** Full architecture diagram showing all services, networking, data flow. Review against AWS Well-Architected Framework.
-- **Acceptance Criteria:**
-  - Architecture diagram created
-  - Reviewed against Well-Architected Framework
-  - Published in `docs/`
-
-### 📌 LSS-35: Cost Optimization Review
-- **Issue Type:** Story
-- **Sprint:** Sprint 7
-- **Priority:** Medium
-- **Labels:** `aws`, `cost`, `optimization`
-- **Description:** Review AWS Cost Explorer. Apply right-sizing recommendations. Document estimated monthly cost breakdown by service.
-- **Acceptance Criteria:**
-  - Cost Explorer reviewed
-  - Right-sizing applied where needed
-  - Monthly cost documented by service
-
-### 📌 LSS-36: Disaster Recovery Design
-- **Issue Type:** Story
-- **Sprint:** Sprint 7
-- **Priority:** High
-- **Labels:** `architecture`, `dr`, `backup`
-- **Description:** Define RPO and RTO. Document backup strategy. Test DR runbook for database restoration. Verify recovery works end-to-end.
-- **Acceptance Criteria:**
-  - RPO and RTO defined
-  - Backup strategy documented
-  - Database restoration tested and verified
-
-### 📌 LSS-37: Load Testing & Capacity Planning
-- **Issue Type:** Story
-- **Sprint:** Sprint 7
-- **Priority:** Medium
-- **Labels:** `performance`, `testing`, `capacity`
-- **Description:** Load test with k6 (100 concurrent users). Identify bottlenecks. Document scaling plan with specific thresholds.
-- **Acceptance Criteria:**
-  - k6 load test (100 concurrent users)
-  - Bottlenecks identified and documented
-  - Scaling plan with thresholds
+  - Helm chart created and installable
+  - Ingress controller routes traffic locally

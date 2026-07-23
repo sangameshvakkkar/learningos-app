@@ -76,12 +76,21 @@ jobs:
         run: python -m pytest
         working-directory: backend
 
-  # ── Job 3: Docker Image Builds ───────────────────────────────────────────
+  # ── Job 3: Docker Image Builds + Security Scan ──────────────────────────
   # Only runs if BOTH validation jobs pass.
-  # Purpose: prove Docker images build successfully before any PR merges.
-  # We don't push images yet (that's Sprint 8 with ECR) — just validate they build.
+  #
+  # LSS-2: Multi-stage Dockerfiles (already implemented in Dockerfiles)
+  # LSS-3: Layer caching via type=gha (below)
+  # LSS-4: Dual tagging — sha (immutable) + latest (mutable pointer to newest)
+  # LSS-5: Trivy scans each image after build. CRITICAL = fail. HIGH = warn.
+  #
+  # Why load: true?
+  #   build-push-action by default uses BuildKit's internal cache and doesn't
+  #   expose the image to the Docker daemon. Trivy needs the image loaded into
+  #   the local Docker daemon to scan it. load: true does exactly that.
+  #   trade-off: slightly slower (extra layer export step), but no registry needed.
   docker-build:
-    name: Docker Build
+    name: Docker Build & Security Scan
     runs-on: ubuntu-latest
     needs: [frontend-validation, backend-validation] # blocks until both pass
 
@@ -92,20 +101,49 @@ jobs:
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3  # enables advanced builder with caching
 
+      # ── Frontend ──────────────────────────────────────────────────────────
       - name: Build Frontend Image
         uses: docker/build-push-action@v6
         with:
           context: ./frontend
-          push: false                   # build only, no push yet (ECR comes Sprint 8)
-          tags: learningos-frontend:${{ github.sha }}
-          cache-from: type=gha          # use GitHub Actions cache for Docker layers
-          cache-to: type=gha,mode=max   # store layers back to cache after build
+          push: false                         # no push yet — ECR push comes in Sprint 2
+          load: true                          # load into local Docker daemon so Trivy can scan it
+          tags: |                             # LSS-4: dual tag strategy
+            learningos-frontend:${{ github.sha }}
+            learningos-frontend:latest
+          cache-from: type=gha               # LSS-3: reuse cached layers from previous runs
+          cache-to: type=gha,mode=max        # store new layers back to cache
 
+      # LSS-5: Trivy scans the frontend image for known CVEs.
+      # --exit-code 1 on CRITICAL means the job (and PR) fails if any CRITICAL vuln found.
+      # HIGH vulns produce table output but do NOT fail the build (--exit-code 0).
+      - name: Scan Frontend Image (Trivy)
+        uses: aquasecurity/trivy-action@v0.28.0
+        with:
+          image-ref: learningos-frontend:${{ github.sha }}
+          format: table                       # human-readable table in CI logs
+          exit-code: '1'                      # fail job on CRITICAL vulnerabilities
+          ignore-unfixed: true                # skip vulns with no fix available (noise reduction)
+          severity: CRITICAL,HIGH             # only report CRITICAL and HIGH
+
+      # ── Backend ───────────────────────────────────────────────────────────
       - name: Build Backend Image
         uses: docker/build-push-action@v6
         with:
           context: ./backend
           push: false
-          tags: learningos-backend:${{ github.sha }}
+          load: true                          # load into Docker daemon for Trivy
+          tags: |
+            learningos-backend:${{ github.sha }}
+            learningos-backend:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Scan Backend Image (Trivy)
+        uses: aquasecurity/trivy-action@v0.28.0
+        with:
+          image-ref: learningos-backend:${{ github.sha }}
+          format: table
+          exit-code: '1'
+          ignore-unfixed: true
+          severity: CRITICAL,HIGH
