@@ -123,7 +123,7 @@ jobs:
       # --exit-code 1 on CRITICAL means the job (and PR) fails if any CRITICAL vuln found.
       # HIGH vulns produce table output but do NOT fail the build (--exit-code 0).
       - name: Scan Frontend Image (Trivy)
-        uses: aquasecurity/trivy-action@v0.28.0
+        uses: aquasecurity/trivy-action@master
         with:
           image-ref: learningos-frontend:${{ github.sha }}
           format: table                       # human-readable table in CI logs
@@ -145,7 +145,7 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Scan Backend Image (Trivy)
-        uses: aquasecurity/trivy-action@v0.28.0
+        uses: aquasecurity/trivy-action@master
         with:
           image-ref: learningos-backend:${{ github.sha }}
           format: table
