@@ -45,10 +45,7 @@ resource "aws_instance" "app" {
   }
 
   tags = {
-    Name        = "${var.app_name}-${var.environment}-ec2"
-    App         = var.app_name
-    Environment = var.environment
-    ManagedBy   = "terraform"
+    Name = "${var.app_name}-${var.environment}-ec2"
   }
 }
 
@@ -58,9 +55,6 @@ resource "aws_eip" "app" {
   domain   = "vpc"
 
   tags = {
-    Name        = "${var.app_name}-${var.environment}-eip"
-    App         = var.app_name
-    Environment = var.environment
-    ManagedBy   = "terraform"
+    Name = "${var.app_name}-${var.environment}-eip"
   }
 }

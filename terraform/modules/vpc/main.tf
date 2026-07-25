@@ -4,10 +4,7 @@ resource "aws_vpc" "main" {
   enable_dns_hostnames = true
 
   tags = {
-    Name        = "${var.app_name}-${var.environment}-vpc"
-    App         = var.app_name
-    Environment = var.environment
-    ManagedBy   = "terraform"
+    Name = "${var.app_name}-${var.environment}-vpc"
   }
 }
 
@@ -15,10 +12,7 @@ resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
 
   tags = {
-    Name        = "${var.app_name}-${var.environment}-igw"
-    App         = var.app_name
-    Environment = var.environment
-    ManagedBy   = "terraform"
+    Name = "${var.app_name}-${var.environment}-igw"
   }
 }
 
@@ -29,10 +23,7 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name        = "${var.app_name}-${var.environment}-public-subnet"
-    App         = var.app_name
-    Environment = var.environment
-    ManagedBy   = "terraform"
+    Name = "${var.app_name}-${var.environment}-public-subnet"
   }
 }
 
@@ -45,10 +36,7 @@ resource "aws_route_table" "public" {
   }
 
   tags = {
-    Name        = "${var.app_name}-${var.environment}-public-rt"
-    App         = var.app_name
-    Environment = var.environment
-    ManagedBy   = "terraform"
+    Name = "${var.app_name}-${var.environment}-public-rt"
   }
 }
 

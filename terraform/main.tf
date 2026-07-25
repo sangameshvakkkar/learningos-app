@@ -1,5 +1,16 @@
 provider "aws" {
   region = var.aws_region
+
+  # Default tags applied to ALL resources in this workspace automatically
+  default_tags {
+    tags = {
+      application    = "learning-os"
+      application_id = "APP000260725"
+      environment    = var.environment
+      cost_center    = "LOS-001"
+      ManagedBy      = "terraform"
+    }
+  }
 }
 
 # ──────────────────────────────────────────────────────────────

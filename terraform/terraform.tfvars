@@ -4,6 +4,6 @@
 aws_region   = "ap-south-1"
 app_name     = "learningos"
 environment  = "dev"
-instance_type = "t2.micro"
-key_name     = "learningos-dev-key"
+instance_type = "t3.micro"
+key_name     = "learningos-keypair"
 github_repo  = "sangameshvakkkar/learningos-app"

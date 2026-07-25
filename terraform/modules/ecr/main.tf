@@ -7,10 +7,7 @@ resource "aws_ecr_repository" "frontend" {
   }
 
   tags = {
-    Name        = "${var.app_name}-${var.environment}-frontend"
-    App         = var.app_name
-    Environment = var.environment
-    ManagedBy   = "terraform"
+    Name = "${var.app_name}-${var.environment}-frontend"
   }
 }
 
@@ -23,10 +20,7 @@ resource "aws_ecr_repository" "backend" {
   }
 
   tags = {
-    Name        = "${var.app_name}-${var.environment}-backend"
-    App         = var.app_name
-    Environment = var.environment
-    ManagedBy   = "terraform"
+    Name = "${var.app_name}-${var.environment}-backend"
   }
 }
 

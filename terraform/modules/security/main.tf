@@ -40,9 +40,6 @@ resource "aws_security_group" "app" {
   }
 
   tags = {
-    Name        = "${var.app_name}-${var.environment}-sg"
-    App         = var.app_name
-    Environment = var.environment
-    ManagedBy   = "terraform"
+    Name = "${var.app_name}-${var.environment}-sg"
   }
 }

@@ -21,9 +21,7 @@ resource "aws_iam_role" "ec2" {
   assume_role_policy = data.aws_iam_policy_document.ec2_assume.json
 
   tags = {
-    App         = var.app_name
-    Environment = var.environment
-    ManagedBy   = "terraform"
+    Name = "${var.app_name}-${var.environment}-ec2-role"
   }
 }
 
@@ -105,9 +103,7 @@ resource "aws_iam_role" "github_actions" {
   assume_role_policy = data.aws_iam_policy_document.github_actions_assume.json
 
   tags = {
-    App         = var.app_name
-    Environment = var.environment
-    ManagedBy   = "terraform"
+    Name = "${var.app_name}-${var.environment}-github-actions-role"
   }
 }
 

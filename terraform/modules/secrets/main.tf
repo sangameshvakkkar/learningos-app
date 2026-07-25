@@ -14,8 +14,6 @@ resource "aws_secretsmanager_secret" "app" {
   recovery_window_in_days = 0
 
   tags = {
-    App         = var.app_name
-    Environment = var.environment
-    ManagedBy   = "terraform"
+    Name = "${var.app_name}-${var.environment}-app-secret"
   }
 }

@@ -37,13 +37,13 @@ variable "aws_az" {
 variable "instance_type" {
   description = "EC2 instance type"
   type        = string
-  default     = "t2.micro" # Free tier eligible
+  default     = "t3.micro" # Free-tier eligible in ap-south-1 (new AWS credit plan)
 }
 
 variable "key_name" {
   description = "Name of the EC2 key pair to use for SSH access"
   type        = string
-  default     = "learningos-dev-key"
+  default     = "learningos-keypair"
 }
 
 variable "image_retention_count" {
