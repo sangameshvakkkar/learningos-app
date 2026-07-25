@@ -160,6 +160,9 @@ jobs:
   deploy:
     name: Push to ECR & Deploy
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     needs: [docker-build]
     if: github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/feature/') || github.ref == 'refs/heads/main')
 
