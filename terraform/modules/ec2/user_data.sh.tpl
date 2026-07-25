@@ -29,37 +29,20 @@ mkdir -p "$APP_DIR"
 cd "$APP_DIR"
 
 echo "==> [4/6] Fetch secrets from AWS Secrets Manager"
+# Fetch secrets and write to .env
 SECRET_JSON=$(aws secretsmanager get-secret-value \
   --secret-id "${secret_id}" \
   --region "${aws_region}" \
   --query SecretString \
   --output text)
 
-# Write .env from secret JSON — ephemeral, never committed
-python3 - <<'EOF'
-import sys, json, os
-
-secret = json.loads(os.environ.get('SECRET_JSON', '{}'))
-env_path = '/opt/learningos/.env'
-with open(env_path, 'w') as f:
-    for k, v in secret.items():
-        f.write(f"{k}={v}\n")
-print(f"[secrets] wrote {len(secret)} variables to {env_path}")
-EOF
-
-export SECRET_JSON="$SECRET_JSON"
-python3 /dev/stdin <<< "
-import sys, json, os
-secret = json.loads(os.environ['SECRET_JSON'])
-with open('/opt/learningos/.env', 'w') as f:
-    for k, v in secret.items():
-        f.write(f'{k}={v}\n')
-print(f'[secrets] {len(secret)} vars written')
-"
+echo "$SECRET_JSON" | python3 -c 'import sys, json; [print(f"{k}={v}") for k,v in json.load(sys.stdin).items()]' > "$APP_DIR/.env"
+echo "[secrets] vars written to .env"
 
 echo "==> [5/6] Authenticate Docker to ECR"
+REGISTRY_URL=$(echo "${frontend_repo}" | cut -d/ -f1)
 aws ecr get-login-password --region "${aws_region}" | \
-  docker login --username AWS --password-stdin "${frontend_repo}"
+  docker login --username AWS --password-stdin "$REGISTRY_URL"
 
 echo "==> [6/6] Write docker-compose and start services"
 cat > "$APP_DIR/docker-compose.yml" <<COMPOSE
@@ -110,17 +93,13 @@ SECRET_JSON=$(aws secretsmanager get-secret-value \
   --region "${aws_region}" \
   --query SecretString \
   --output text)
-python3 - <<EOF
-import sys, json, os
-secret = json.loads(os.environ['SECRET_JSON'])
-with open('/opt/learningos/.env', 'w') as f:
-    for k, v in secret.items():
-        f.write(f'{k}={v}\n')
-EOF
+
+echo "$SECRET_JSON" | python3 -c 'import sys, json; [print(f"{k}={v}") for k,v in json.load(sys.stdin).items()]' > "$APP_DIR/.env"
 
 echo "[deploy] Pulling latest images from ECR..."
+REGISTRY_URL=$(echo "${frontend_repo}" | cut -d/ -f1)
 aws ecr get-login-password --region "${aws_region}" | \
-  docker login --username AWS --password-stdin "${frontend_repo}"
+  docker login --username AWS --password-stdin "$REGISTRY_URL"
 docker compose pull
 
 echo "[deploy] Restarting containers..."
