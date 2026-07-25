@@ -18,8 +18,8 @@ describe("Button component", () => {
 
   it("applies variant classes correctly", () => {
     const { container } = render(<Button variant="secondary">Secondary</Button>);
-    // We expect the secondary variant to have a lighter background, like bg-slate-100 or dark:bg-slate-800
-    expect(container.firstChild).toHaveClass("bg-slate-100");
+    // We expect the secondary variant to have a white background and a border
+    expect(container.firstChild).toHaveClass("bg-white");
   });
 
   it("disables the button when disabled prop is passed", () => {
