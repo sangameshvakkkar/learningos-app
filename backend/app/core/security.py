@@ -1,11 +1,16 @@
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
-from jose import JWTError, jwt
+# pyrefly: ignore [missing-import]
+import jwt
+
+# pyrefly: ignore [missing-import]
+from jwt.exceptions import InvalidTokenError as JWTError
+
+# pyrefly: ignore [missing-import]
 from passlib.context import CryptContext
 
 from app.core.config import settings
-
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 ALGORITHM = "HS256"

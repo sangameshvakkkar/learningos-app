@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000/api/v1";
+const API_URL = import.meta.env.VITE_API_URL ?? "/api/v1";
 
 export const api = axios.create({
   baseURL: API_URL,
@@ -16,3 +16,16 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem("learningos_token");
+      if (window.location.pathname.startsWith("/app")) {
+        window.location.href = "/login";
+      }
+    }
+    return Promise.reject(error);
+  }
+);

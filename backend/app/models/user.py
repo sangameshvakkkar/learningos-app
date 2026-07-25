@@ -22,3 +22,4 @@ class User(Base):
     )
 
     enrollments = relationship("Enrollment", back_populates="user", cascade="all, delete-orphan")
+    lesson_progress = relationship("LessonProgress", back_populates="user", cascade="all, delete-orphan")

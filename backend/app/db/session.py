@@ -1,11 +1,9 @@
 from collections.abc import Generator
 
-from sqlalchemy import MetaData
+from sqlalchemy import MetaData, create_engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
-from sqlalchemy import create_engine
 
 from app.core.config import settings
-
 
 convention = {
     "ix": "ix_%(column_0_label)s",
