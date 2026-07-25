@@ -30,4 +30,4 @@ async def test_get_courses_empty_or_seeded(client: AsyncClient, auth_headers):
 @pytest.mark.asyncio
 async def test_unauthorized_access(client: AsyncClient):
     response = await client.get("/api/v1/courses/me/enrollments")
-    assert response.status_code == 403 # FastAPI HTTPBearer returns 403 for missing token by default
+    assert response.status_code == 401 # Should return 401 Unauthorized
