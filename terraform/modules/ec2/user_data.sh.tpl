@@ -12,7 +12,7 @@ echo "==> [1/6] System update"
 dnf update -y
 
 echo "==> [2/6] Install Docker + AWS CLI + Python3"
-dnf install -y docker python3 python3-pip aws-cli
+dnf install -y docker python3 python3-pip
 systemctl enable docker
 systemctl start docker
 usermod -aG docker ec2-user
