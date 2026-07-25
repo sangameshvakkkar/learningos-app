@@ -71,11 +71,6 @@ services:
         condition: service_healthy
 COMPOSE
 
-docker compose pull
-docker compose up -d
-
-echo "==> Bootstrap complete. App should be reachable on port 80."
-
 # ──────────────────────────────────────────────────────────────────────────────
 # Deploy script — used by GitHub Actions CI/CD on subsequent deployments
 # Written to disk so CI can invoke via SSH:
@@ -110,3 +105,11 @@ DEPLOY
 
 chmod +x "$APP_DIR/deploy.sh"
 chown -R ec2-user:ec2-user "$APP_DIR"
+
+# Now try to pull and start containers (might fail if ECR is empty, which is fine on first boot)
+echo "==> [7/7] Attempting initial docker compose pull/up..."
+docker compose pull || true
+docker compose up -d || true
+
+echo "==> Bootstrap complete. App should be reachable on port 80."
+
