@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { getCourses, getMyEnrollments } from "../api/courses";
 import { getAllProgress } from "../api/lessons";
 import { Button } from "../components/ui/Button";
-import { MetricSkeleton, CardSkeleton } from "../components/ui/Skeleton";
+import { MetricSkeleton } from "../components/ui/Skeleton";
 import { useAuth } from "../context/AuthContext";
 
 export function DashboardPage() {
@@ -47,7 +47,6 @@ export function DashboardPage() {
           <h2 className="mb-4 text-xl font-bold text-ink dark:text-white">Your Enrollments</h2>
           <div className="grid gap-4 md:grid-cols-2">
             {enrollments.map((enrollment) => {
-              const courseProgress = progress.filter(p => courses.find(c => c.id === enrollment.course.id)?.lessons_count).length; // simple approximation or actual data
               // The accurate way is to get the course.id's lessons from progress but progress only has lesson_id.
               // To simplify, we just show the course card without progress percentage unless we calculate it.
               return (

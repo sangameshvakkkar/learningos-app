@@ -8,7 +8,7 @@ export async function getCourses(params?: {
   limit?: number;
 }): Promise<Course[]> {
   const cleanParams = Object.fromEntries(
-    Object.entries(params || {}).filter(([_, v]) => v !== undefined && v !== "")
+    Object.entries(params || {}).filter(([, v]) => v !== undefined && v !== "")
   );
   const { data } = await api.get<Course[]>("/courses", { params: cleanParams });
   return data;

@@ -5,7 +5,6 @@ import { Search } from "lucide-react";
 
 import { enrollInCourse, getCourses, getMyEnrollments } from "../api/courses";
 import { CourseCard } from "../features/courses/CourseCard";
-import { Input } from "../components/ui/Input";
 import { CardSkeleton } from "../components/ui/Skeleton";
 
 export function CatalogPage() {
