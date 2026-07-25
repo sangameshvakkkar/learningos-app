@@ -89,11 +89,14 @@ data "aws_iam_policy_document" "github_actions_assume" {
       values   = ["sts.amazonaws.com"]
     }
 
-    # Only the specific repo's main branch can assume this role
+    # Allow the specific repo's main and feature branches to assume this role for dev deployments
     condition {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:${var.github_repo}:ref:refs/heads/main"]
+      values   = [
+        "repo:${var.github_repo}:ref:refs/heads/main",
+        "repo:${var.github_repo}:ref:refs/heads/feature/*"
+      ]
     }
   }
 }
