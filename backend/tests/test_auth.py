@@ -28,7 +28,7 @@ async def test_register_duplicate_user(client: AsyncClient):
         json={"email": email, "password": "Password123!", "full_name": "Test User"}
     )
     assert response.status_code == 409
-    assert response.json()["detail"] == "Email already registered"
+    assert response.json()["detail"] == "Email is already registered"
 
 @pytest.mark.asyncio
 async def test_login_success(client: AsyncClient):
