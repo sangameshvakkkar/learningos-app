@@ -2,9 +2,9 @@ name: LearningOS CI
 
 on:
   pull_request:
-    branches: [main, "feature/**"]
+    branches: [develop, "feature/**"]
   push:
-    branches: [main, "feature/**"] # deploy on dev branch pushes
+    branches: [develop, "feature/**"] # deploy on dev branch pushes
 
 # Required for OIDC token generation (AWS auth without long-lived keys)
 permissions:
@@ -164,7 +164,7 @@ jobs:
       id-token: write
       contents: read
     needs: [docker-build]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
 
     env:
       AWS_REGION: ap-south-1
