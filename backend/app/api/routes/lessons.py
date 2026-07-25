@@ -8,11 +8,11 @@ from app.schemas.lesson_progress import LessonProgressRead
 from app.services.courses import get_course
 from app.services.lessons import (
     create_lesson,
+    get_all_user_progress,
     get_lesson,
     get_user_progress_for_course,
     list_lessons_for_course,
     mark_lesson_complete,
-    get_all_user_progress,
 )
 
 router = APIRouter()

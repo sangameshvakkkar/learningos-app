@@ -4,7 +4,6 @@ from app.db.session import SessionLocal
 from app.models.course import Course
 from app.models.lesson import Lesson
 
-
 COURSES = [
     {
         "title": "Docker Fundamentals",

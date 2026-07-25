@@ -1,6 +1,7 @@
 import pytest
 from httpx import AsyncClient
 
+
 @pytest.fixture
 async def auth_headers(client: AsyncClient):
     email = "course_user@example.com"
