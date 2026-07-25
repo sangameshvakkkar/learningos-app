@@ -5,20 +5,26 @@ from app.api.deps import get_db
 from app.db.session import Base
 from app.main import app
 from httpx import ASGITransport, AsyncClient
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
 
-# Use an in-memory SQLite database for testing
-SQLALCHEMY_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
+# Use an in-memory SQLite database for testing (synchronous, matching app code)
+SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
 
-engine = create_async_engine(
+engine = create_engine(
     SQLALCHEMY_DATABASE_URL,
     connect_args={"check_same_thread": False},
+    poolclass=StaticPool,
 )
-TestingSessionLocal = async_sessionmaker(autocommit=False, autoflush=False, bind=engine)
+TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-async def override_get_db():
-    async with TestingSessionLocal() as session:
-        yield session
+def override_get_db():
+    db = TestingSessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 app.dependency_overrides[get_db] = override_get_db
 
@@ -30,12 +36,10 @@ def event_loop():
     loop.close()
 
 @pytest.fixture(scope="session", autouse=True)
-async def setup_db():
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+def setup_db():
+    Base.metadata.create_all(bind=engine)
     yield
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
+    Base.metadata.drop_all(bind=engine)
 
 @pytest.fixture
 async def client():
