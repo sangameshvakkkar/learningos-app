@@ -8,7 +8,7 @@ async def test_register_user(client: AsyncClient):
         "/api/v1/auth/register",
         json={"email": "test@example.com", "password": "Password123!", "full_name": "Test User"}
     )
-    assert response.status_code == 200
+    assert response.status_code == 201
     data = response.json()
     assert data["email"] == "test@example.com"
     assert "id" in data
@@ -27,7 +27,7 @@ async def test_register_duplicate_user(client: AsyncClient):
         "/api/v1/auth/register",
         json={"email": email, "password": "Password123!", "full_name": "Test User"}
     )
-    assert response.status_code == 400
+    assert response.status_code == 409
     assert response.json()["detail"] == "Email already registered"
 
 @pytest.mark.asyncio
@@ -41,7 +41,7 @@ async def test_login_success(client: AsyncClient):
     
     response = await client.post(
         "/api/v1/auth/login",
-        data={"username": email, "password": password}
+        json={"email": email, "password": password}
     )
     assert response.status_code == 200
     data = response.json()
@@ -52,6 +52,6 @@ async def test_login_success(client: AsyncClient):
 async def test_login_failure(client: AsyncClient):
     response = await client.post(
         "/api/v1/auth/login",
-        data={"username": "wrong@example.com", "password": "wrongpassword"}
+        json={"email": "wrong@example.com", "password": "wrongpassword"}
     )
     assert response.status_code == 401

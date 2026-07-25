@@ -12,7 +12,7 @@ async def auth_headers(client: AsyncClient):
     )
     res = await client.post(
         "/api/v1/auth/login",
-        data={"username": email, "password": password}
+        json={"email": email, "password": password}
     )
     token = res.json()["access_token"]
     return {"Authorization": f"Bearer {token}"}
@@ -20,7 +20,7 @@ async def auth_headers(client: AsyncClient):
 
 @pytest.mark.asyncio
 async def test_get_courses_empty_or_seeded(client: AsyncClient, auth_headers):
-    response = await client.get("/api/v1/courses/", headers=auth_headers)
+    response = await client.get("/api/v1/courses", headers=auth_headers)
     assert response.status_code == 200
     data = response.json()
     assert isinstance(data, list)
@@ -29,5 +29,5 @@ async def test_get_courses_empty_or_seeded(client: AsyncClient, auth_headers):
 
 @pytest.mark.asyncio
 async def test_unauthorized_access(client: AsyncClient):
-    response = await client.get("/api/v1/courses/")
+    response = await client.get("/api/v1/courses")
     assert response.status_code == 403 # FastAPI HTTPBearer returns 403 for missing token by default
