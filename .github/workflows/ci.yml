@@ -171,7 +171,7 @@ jobs:
       AWS_REGION: ap-south-1
       ECR_FRONTEND: 447184491549.dkr.ecr.ap-south-1.amazonaws.com/learningos-dev-frontend
       ECR_BACKEND: 447184491549.dkr.ecr.ap-south-1.amazonaws.com/learningos-dev-backend
-      EC2_HOST: 3.108.93.127
+      EC2_HOST: 13.205.32.170
       EC2_USER: ec2-user
 
     steps:
